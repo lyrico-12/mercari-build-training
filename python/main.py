@@ -20,7 +20,7 @@ def get_db():
     if not db.exists():
         yield
 
-    conn = sqlite3.connect(db)
+    conn = sqlite3.connect(db, check_same_thread=False)
     conn.row_factory = sqlite3.Row  # Return rows as dictionaries
     try:
         yield conn
@@ -30,8 +30,13 @@ def get_db():
 
 # STEP 5-1: set up the database connection
 def setup_database():
-    pass
-
+    conn = sqlite3.connect(db)
+    cursor = conn.cursor()
+    sql_file = pathlib.Path(__file__).parent.resolve() / "db" / "items.sql"
+    with open(sql_file, "r") as f:
+        cursor.executescript(f.read())
+    conn.commit()
+    conn.close()
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -80,7 +85,15 @@ async def add_item(
     
     # 画像をハッシュ化して保存する
     image_name = await hash_and_save_image(image)
-    insert_item(Item(name=name, category=category, image_name=image_name))
+    
+    # データベースに挿入
+    cursor = db.cursor()
+    cursor.execute(
+        "INSERT INTO items (name, category, image_name) VALUES (?, ?, ?)",
+        (name, category, image_name)
+    )
+    db.commit()
+    
     return AddItemResponse(**{"message": f"item received: {name}"})
 
 
@@ -88,20 +101,26 @@ class GetItemsResponse(BaseModel):
     items: list[dict]
 
 @app.get("/items", response_model=GetItemsResponse)
-def get_item():
-    with open("items.json", "r", encoding="utf-8") as f:
-        data = json.load(f)
-    return GetItemsResponse(**{"items": data["items"]})
+def get_item(db: sqlite3.Connection = Depends(get_db)):
+    cursor = db.cursor()
+    cursor.execute("SELECT * FROM items")
+    rows = cursor.fetchall()
+    for i in range(len(rows)):
+        rows[i] = dict(rows[i])    
+    return GetItemsResponse(**{"items": rows})
 
 
 @app.get("/items/{item_id}")
-def get_nth_item(item_id: int):
+def get_nth_item(item_id: int, db: sqlite3.Connection = Depends(get_db)):
     if item_id < 1:
         raise HTTPException(status_code=400, detail="ID should be larger than 1")
     
-    with open("items.json", "r", encoding="utf-8") as f:
-        data = json.load(f)
-    return data["items"][item_id - 1]
+    cursor = db.cursor()
+    cursor.execute("SELECT * FROM items WHERE id = ?", (item_id,))
+    row = cursor.fetchone()
+    if row is None:
+        raise HTTPException(status_code=404, detail="Item not found")
+    return row
 
 
 # get_image is a handler to return an image for GET /images/{filename} .
@@ -148,18 +167,3 @@ async def hash_and_save_image(image: UploadFile):
         f.write(contents)
 
     return res
-
-
-
-def insert_item(item: Item):
-    # STEP 4-1: add an implementation to store an item
-    with open("items.json", "r", encoding="utf-8") as f:
-        data = json.load(f)
-
-    new_item = {"name": item.name, "category": item.category, "image_name": item.image_name}
-    data["items"].append(new_item)
-    
-    with open("items.json", "w", encoding="utf-8") as f:
-        json.dump(data, f, indent=4)
-    
-    return
