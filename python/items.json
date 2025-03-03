@@ -1,0 +1,19 @@
+{
+    "items": [
+        {
+            "name": "jacket",
+            "category": "fashion",
+            "image_name": "27d6326fc255c2e444ffa486ec71cd374c3f86fbdfa0ea4418c6458efae5d9e1.jpg"
+        },
+        {
+            "name": "hat",
+            "category": "fashion",
+            "image_name": "954990a2820e7628bf41f5f2f37073ac66c367228d6570e8fbad264d23e41c8b.jpg"
+        },
+        {
+            "name": "jacket",
+            "category": "fashion",
+            "image_name": "27d6326fc255c2e444ffa486ec71cd374c3f86fbdfa0ea4418c6458efae5d9e1.jpg"
+        }
+    ]
+}
