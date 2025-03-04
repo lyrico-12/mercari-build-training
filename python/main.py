@@ -122,6 +122,19 @@ def get_nth_item(item_id: int, db: sqlite3.Connection = Depends(get_db)):
         raise HTTPException(status_code=404, detail="Item not found")
     return row
 
+@app.get("/search")
+def search_items(keyword: str, db: sqlite3.Connection = Depends(get_db)):
+    if keyword == "":
+        raise HTTPException(status_code=400, detail="keyword is null")
+    
+    cursor = db.cursor()
+    cursor.execute("SELECT * FROM items WHERE name LIKE ?", (f"%{keyword}%",))
+    rows = cursor.fetchall()
+    for i in range(len(rows)):
+        rows[i] = dict(rows[i])
+
+    return GetItemsResponse(**{"items": rows})
+
 
 # get_image is a handler to return an image for GET /images/{filename} .
 @app.get("/image/{image_name}")
