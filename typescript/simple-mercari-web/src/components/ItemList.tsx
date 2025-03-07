@@ -6,11 +6,12 @@ const PLACEHOLDER_IMAGE = import.meta.env.VITE_FRONTEND_URL + '/logo192.png';
 interface Prop {
   reload: boolean;
   onLoadCompleted: () => void;
-}
+}  
 
 export const ItemList = ({ reload, onLoadCompleted }: Prop) => {
   const [items, setItems] = useState<Item[]>([]);
   useEffect(() => {
+    // fetchData関数の定義
     const fetchData = () => {
       fetchItems()
         .then((data) => {
@@ -23,22 +24,26 @@ export const ItemList = ({ reload, onLoadCompleted }: Prop) => {
         });
     };
 
+    // reloadがTrueの時に実行
     if (reload) {
       fetchData();
     }
-  }, [reload, onLoadCompleted]);
+  }, [reload, onLoadCompleted]);// reload, onLoadCompletedの値が変わるたびに実行する
 
   return (
     <div>
       {items.map((item) => {
+        // specify image's url of the item
+        const imageUrl = import.meta.env.VITE_BACKEND_URL + "/image/" + item.image_name;
         return (
           <div key={item.id} className="ItemList">
             {/* TODO: Task 2: Show item images */}
-            <img src={PLACEHOLDER_IMAGE} />
+            <img src={imageUrl} />
             <p>
               <span>Name: {item.name}</span>
               <br />
               <span>Category: {item.category}</span>
+            
             </p>
           </div>
         );

@@ -20,6 +20,7 @@ export const fetchItems = async (): Promise<ItemListResponse> => {
       Accept: 'application/json',
     },
   });
+  
   return response.json();
 };
 
