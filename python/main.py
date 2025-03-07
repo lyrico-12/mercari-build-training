@@ -119,6 +119,19 @@ def get_item(db: sqlite3.Connection = Depends(get_db)):
         rows[i] = dict(rows[i])    
     return GetItemsResponse(**{"items": rows})
 
+# add an endpoint of getting categories from database
+class GetCategoriesResponse(BaseModel):
+    categories: list[dict]
+
+@app.get("/categories", response_model=GetCategoriesResponse)
+def get_category(db: sqlite3.Connection = Depends(get_db)):
+    cursor = db.cursor()
+    cursor.execute("SELECT * FROM categories")
+    rows = cursor.fetchall()
+    for i in range(len(rows)):
+        rows[i] = dict(rows[i])
+    return GetCategoriesResponse(**{"categories": rows})
+
 
 @app.get("/items/{item_id}")
 def get_nth_item(item_id: int, db: sqlite3.Connection = Depends(get_db)):
