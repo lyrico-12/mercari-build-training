@@ -12,16 +12,44 @@ export interface ItemListResponse {
 }
 
 export const fetchItems = async (): Promise<ItemListResponse> => {
-  const response = await fetch(`${SERVER_URL}/items`, {
-    method: 'GET',
-    mode: 'cors',
-    headers: {
-      'Content-Type': 'application/json',
-      Accept: 'application/json',
-    },
+  // responses from /items endpoint and /categories endpoint
+  const [itemsResponse, categoriesResponse] = await Promise.all([
+    fetch(`${SERVER_URL}/items`, {
+      method: 'GET',
+      mode: 'cors',
+      headers: {
+        'Content-Type': 'application/json',
+        Accept: 'application/json',
+      },
+    }), 
+    fetch(`${SERVER_URL}/categories`, {
+      method: 'GET',
+      mode: 'cors',
+      headers: {
+        'Content-Type': 'application/json',
+        Accept: 'application/json',
+      },
+    })
+  ]);
+
+  const itemsData = await itemsResponse.json();
+  const categoriesData = await categoriesResponse.json();
+
+  // map category_id to category_name
+  const categoryMap: Record<number, string> = {};
+  categoriesData.categories.forEach((category: {id: number; name: string}) => {
+    categoryMap[category.id] = category.name;
   });
-  
-  return response.json();
+
+  // create response to correctly show name of the category 
+  const response = itemsData.items.map((item: {id: number; name: string; category_id: number, image_name: string}) => ({
+    id: item.id,
+    name: item.name,
+    category: categoryMap[item.category_id],
+    image_name: item.image_name,
+  }));
+
+  return {"items": response};
 };
 
 export interface CreateItemInput {
