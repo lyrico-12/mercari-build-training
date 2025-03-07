@@ -31,16 +31,16 @@ export const ItemList = ({ reload, onLoadCompleted }: Prop) => {
   }, [reload, onLoadCompleted]);// reload, onLoadCompletedの値が変わるたびに実行する
 
   return (
-    <div>
+    <div className='itemlist-container'>
       {items.map((item) => {
         // specify image's url of the item
         const imageUrl = import.meta.env.VITE_BACKEND_URL + "/image/" + item.image_name;
         return (
           <div key={item.id} className="ItemList">
             {/* TODO: Task 2: Show item images */}
-            <img src={imageUrl} />
-            <p>
-              <span>Name: {item.name}</span>
+            <img src={imageUrl} className='item-image'/>
+            <p className='name-category'>
+              <span >Name: {item.name}</span>
               <br />
               <span>Category: {item.category}</span>
             

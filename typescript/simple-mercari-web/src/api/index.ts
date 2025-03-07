@@ -13,7 +13,7 @@ export interface ItemListResponse {
 
 export const fetchItems = async (): Promise<ItemListResponse> => {
   // responses from /items endpoint and /categories endpoint
-  const [itemsResponse, categoriesResponse] = await Promise.all([
+  const [itemsResponse, categoriesResponse] = await Promise.all([ // Promiseall enables to fetch multiple response
     fetch(`${SERVER_URL}/items`, {
       method: 'GET',
       mode: 'cors',
