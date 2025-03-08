@@ -2,14 +2,16 @@ version: "3.9"
 
 services:
   back:
-    image: mercari-build-training/app
+    build: ./python
+    # image: mercari-build-training/app
     ports:
       - "9000:9000"
     networks:
       - build-network
 
   front:
-    image: mercari-build-training/web
+    build: ./typescript/simple-mercari-web
+    # image: mercari-build-training/web
     ports:
       - "3000:3000"
     environment:
