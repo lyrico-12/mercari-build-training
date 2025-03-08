@@ -50,7 +50,7 @@ export const Listing = ({ onListingCompleted }: Prop) => {
   return (
     <div className="Listing">
       <form onSubmit={onSubmit}>
-        <div>
+        <div className='listing-container'>
           <input
             type="text"
             name="name"
