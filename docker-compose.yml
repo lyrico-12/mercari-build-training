@@ -1,0 +1,22 @@
+version: "3.9"
+
+services:
+  back:
+    image: mercari-build-training/app
+    ports:
+      - "9000:9000"
+    networks:
+      - build-network
+
+  front:
+    image: mercari-build-training/web
+    ports:
+      - "3000:3000"
+    environment:
+      - REACT_APP_API_URL=http://back:9000
+    networks:
+      - build-network
+
+networks:
+  build-network:
+    driver: bridge
