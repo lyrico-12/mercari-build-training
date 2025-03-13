@@ -52,6 +52,24 @@ export const fetchItems = async (): Promise<ItemListResponse> => {
   return {"items": response};
 };
 
+
+export const fetchSearchItems = async (name: string): Promise<ItemListResponse> => {
+  const query = encodeURIComponent(name);
+  const response = await fetch(`${SERVER_URL}/search?keyword=${query}`, {
+    method: 'GET',
+    mode: 'cors',
+    headers: {
+      'Content-Type': 'application/json',
+      Accept: 'application/json',
+    },
+  });
+
+  if (response.status >= 400) {
+    throw new Error('Failed to fetch items from the server');
+  }
+  return response.json();
+};
+
 export interface CreateItemInput {
   name: string;
   category: string;
@@ -70,3 +88,11 @@ export const postItem = async (input: CreateItemInput): Promise<Response> => {
   });
   return response;
 };
+
+export const deleteItem = async (id: number): Promise<Response> => {
+  const response = await fetch(`${SERVER_URL}/items/${id}`, {
+    method: 'DELETE',
+    mode: 'cors',
+  });
+  return response
+}
