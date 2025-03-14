@@ -30,6 +30,7 @@ export const ItemList = ({ reload, onLoadCompleted }: Prop) => {
     // reloadがTrueの時に実行
     if (reload) {
       fetchData();
+      setSearchItems([]);
     }
   }, [reload, onLoadCompleted]);// reload, onLoadCompletedの値が変わるたびに実行する
 
@@ -63,34 +64,40 @@ export const ItemList = ({ reload, onLoadCompleted }: Prop) => {
       <div className='Search'>
         <form>
           <input 
+            className='search-input'
             type='text'
             name='name'
             placeholder='name'
             value={searchObj.name}
             onChange={onValueChange}/>
-          <button type='button' onClick={() => handleSearch(searchObj.name)}>Search</button>
+          <button className='search-button' type='button' onClick={() => handleSearch(searchObj.name)}>Search</button>
         </form>
       </div>
       <div className='itemlist-container'>
-        {items.map((item) => {
-          // specify image's url of the item
-          const imageUrl = import.meta.env.VITE_BACKEND_URL + "/image/" + item.image_name;
-          
-          return (
-            <div key={item.id} className="ItemList">
-              {/* TODO: Task 2: Show item images */}
-              <button className="delete-button" onClick={()=>handleDelete(item.id)}>🗑️</button>
-              <img src={imageUrl} className='item-image'/>
-              <p className='name-category'>
-                <span >Name: {item.name}</span>
-                <br />
-                <span>Category: {item.category}</span>
-              
-              </p>
-            </div>
-          );
-          }
-        )}
+      {searchItems.length > 0 ? (
+        searchItems.map((item) => (
+          <div key={item.id} className="ItemList">
+            <img src={import.meta.env.VITE_BACKEND_URL + "/image/" + item.image_name} className='item-image'/>
+            <p className='name-category'>
+              <span>Name: {item.name}</span>
+              <br />
+              <span>Category: {item.category}</span>
+            </p>
+          </div>
+        ))
+      ) : (
+        items.map((item) => (
+          <div key={item.id} className="ItemList">
+            <button className="delete-button" onClick={() => handleDelete(item.id)}>🗑️</button>
+            <img src={import.meta.env.VITE_BACKEND_URL + "/image/" + item.image_name} className='item-image'/>
+            <p className='name-category'>
+              <span>Name: {item.name}</span>
+              <br />
+              <span>Category: {item.category}</span>
+            </p>
+          </div>
+        ))
+      )}
       </div>
     </>
     

@@ -86,7 +86,7 @@ export const postItem = async (input: CreateItemInput): Promise<Response> => {
     mode: 'cors',
     body: data,
   });
-  return response;
+  return response.json();
 };
 
 export const deleteItem = async (id: number): Promise<Response> => {
