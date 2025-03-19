@@ -203,3 +203,18 @@ async def hash_and_save_image(image: UploadFile):
         f.write(contents)
 
     return res
+
+@app.delete("/items/{item_id}")
+def delete_item(item_id: int, db: sqlite3.Connection = Depends(get_db)):
+    cursor = db.cursor()
+
+    cursor.execute("SELECT * FROM items2 WHERE id = ?", (item_id, ))
+    row = cursor.fetchone()
+
+    if not row:
+        raise HTTPException(status_code = 404, detail = "Item not found")
+    
+    cursor.execute("DELETE FROM items2 WHERE id = ?", (item_id,))
+    db.commit()
+
+    return {"message": f"Items {item_id} deleted successfully"}
